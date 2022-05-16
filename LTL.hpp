@@ -20,11 +20,14 @@ class LTL_Base {
 
 	virtual std::vector<std::shared_ptr<LTL_Base>> get_children() const;
 	virtual std::string to_string() const;
-	std::set<std::shared_ptr<LTL_Base>> get_closure() const;
+	virtual std::set<std::shared_ptr<LTL_Base>> get_closure() const;
 };
 
 class Negation: public LTL_Base {
 	public:
+
+	Negation(std::shared_ptr<LTL_Base> phi_): phi(phi_) {}
+	Negation(LTL_Base *phi_) {Negation(std::shared_ptr<LTL_Base>(phi_));}
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;

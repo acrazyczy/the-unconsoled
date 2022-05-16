@@ -7,8 +7,26 @@
 
 namespace LTL {
 std::set<std::shared_ptr<LTL_Base>> LTL_Base::get_closure() const {
-	std::set<std::shared_ptr<LTL_Base>> ret;
-	return ret;
+	std::set<std::shared_ptr<LTL_Base>> ret{
+		std::shared_ptr<LTL_Base>(const_cast<LTL_Base *>(this)),
+		std::shared_ptr<LTL_Base>(new Negation(const_cast<LTL_Base *>(this))),
+	};
+	for (auto phi: get_children()) {
+		std::set<std::shared_ptr<LTL_Base>> tmp(std::move(phi -> get_closure()));
+		ret.insert(tmp.begin(), tmp.end());
+	}
+	return std::move(ret);
+}
+
+std::set<std::shared_ptr<LTL_Base>> Negation::get_closure() const {
+	std::set<std::shared_ptr<LTL_Base>> ret{
+		std::shared_ptr<LTL_Base>(const_cast<Negation *>(this))
+	};
+	for (auto phi: get_children()) {
+		std::set<std::shared_ptr<LTL_Base>> tmp(std::move(phi -> get_closure()));
+		ret.insert(tmp.begin(), tmp.end());
+	}
+	return std::move(ret);
 }
 
 std::vector<std::shared_ptr<LTL_Base>> Negation::get_children() const {

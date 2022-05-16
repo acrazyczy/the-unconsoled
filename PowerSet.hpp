@@ -13,9 +13,14 @@
 template <typename T>
 class PowerSet {
 	public:
+	PowerSet(const std::vector<std::shared_ptr<T>> &universe);
+
+	std::set<std::shared_ptr<T>> get_universe() const;
+	std::shared_ptr<std::set<std::shared_ptr<T>>> get_subset(const std::vector<std::shared_ptr<T>> &s) const;
+	std::set<std::shared_ptr<std::set<std::shared_ptr<T>>>> get_subsets() const;
 	private:
-	std::map<T, size_t> atom;
-	std::map<size_t, std::shared_ptr<std::set<T>>> subsets;
+	std::map<std::shared_ptr<T>, size_t> universe;
+	std::map<size_t, std::shared_ptr<std::set<std::shared_ptr<T>>>> subsets;
 };
 
 

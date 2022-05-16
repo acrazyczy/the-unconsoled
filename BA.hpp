@@ -15,7 +15,7 @@
 #include "PowerSet.hpp"
 
 namespace BA {
-typedef LTL::LTL_Base LTL_Base;
+using LTL::LTL_Base;
 
 class State {
 	public:
@@ -24,7 +24,7 @@ class State {
 	bool is_initial;
 };
 
-class Proposition {
+class Symbol {
 };
 
 class BA {
@@ -32,8 +32,9 @@ class BA {
 
 	protected:
 
-	std::map<std::shared_ptr<State>, > delta;
+	std::map<std::shared_ptr<State>, std::map<std::shared_ptr<Symbol>, std::shared_ptr<State>>> delta;
 	std::vector<std::shared_ptr<State>> states;
+	std::vector<std::shared_ptr<Symbol>> alphabet;
 };
 
 class NBA: public BA {
@@ -42,38 +43,7 @@ class NBA: public BA {
 
 class GNBA: public BA {
 	public:
-	GNBA(std::shared_ptr<LTL_Base> phi, const PowerSet<TS::Proposition> &ps) {
-		std::set<std::shared_ptr<LTL_Base>>	closure = std::move(phi -> get_closure());
-		std::set<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>> elementary_sets;
-		std::map<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>, std::shared_ptr<State>> set2state;
-		for (auto B: elementary_sets) {
-			std::shared_ptr<State> state(new State(B -> find(phi) != B -> end()));
-			set2state.emplace(B, state), states.push_back(state);
-		}
-		for (auto psi: closure)
-			if (instanceof<LTL::Until>(psi)) {
-				std::set<std::shared_ptr<State>> F_psi;
-				std::shared_ptr<LTL_Base> phi1 = *psi -> get_children().rbegin();
-				for (auto B: elementary_sets)
-					if (B -> find(psi) == B -> end() || B -> find(phi1) != B -> end())
-						F_psi.insert(set2state.at(B));
-				F.push_back(std::move(F_psi));
-			}
-		for (auto B: elementary_sets) {
-			std::vector<std::shared_ptr<LTL_Base>> intersection;
-			for (auto psi: )
-				if (B -> find(psi) != B -> end())
-					intersection.push_back(psi);
-			for (auto A: elementary_sets) {
-				bool flag = intersection.size() == A -> size();
-				for (auto it = intersection.begin();it != intersection.end() && flag;++ it)
-					flag &= A -> find(*it) != A -> end();
-				if (!flag) continue;
-
-				break;
-			}
-		}
-	}
+	GNBA(std::shared_ptr<LTL_Base> phi, const std::vector<std::shared_ptr<LTL_Base>> &AP);
 
 	private:
 

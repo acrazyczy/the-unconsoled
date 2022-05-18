@@ -12,7 +12,7 @@
 
 template<typename Base, typename T>
 inline bool instanceof(const std::shared_ptr<T> ptr) {
-	return std::dynamic_pointer_cast<Base>(ptr).get() != nullptr;
+	return ptr.get() != nullptr && std::dynamic_pointer_cast<Base>(ptr).get() != nullptr;
 }
 
 template<class T>

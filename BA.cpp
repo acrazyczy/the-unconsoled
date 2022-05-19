@@ -6,9 +6,11 @@
 #include "BA.hpp"
 
 namespace BA {
-NBA::NBA(std::shared_ptr<GNBA> gnba){
+bool State::get_is_initial() const {return is_initial;}
+
+NBA::NBA(const std::shared_ptr<GNBA> gnba){
 	size_t k = gnba -> F.size();
-	std::vector<std::vector<std::shared_ptr<State>>> states_list; // S * [k]
+	std::vector<std::vector<std::shared_ptr<State>>> states_list; // N_S * [k]
 	std::map<std::shared_ptr<State>, size_t> index;
 	for (size_t i = 0;i < gnba -> states.size();++ i) {
 		index.emplace(gnba -> states.at(i), i);
@@ -44,12 +46,12 @@ NBA::NBA(std::shared_ptr<GNBA> gnba){
 	alphabet = gnba -> alphabet;
 }
 
-GNBA::GNBA(std::shared_ptr<LTL_Base> phi, const std::vector<std::shared_ptr<LTL_Base>> &AP) {
+GNBA::GNBA(std::shared_ptr<LTL_Base> phi, const std::vector<std::shared_ptr<LTL_Base>> &AP, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, PowerSet<LTL_Base> &power_set) {
 	std::set<std::shared_ptr<LTL_Base>> closure = std::move(phi -> get_closure());
 
 	// compute elementary sets of closure(phi)
 	std::set<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>> elementary_sets;
-	PowerSet<LTL_Base> power_set(std::vector<std::shared_ptr<LTL_Base>>(closure.begin(), closure.end()));
+	power_set = PowerSet<LTL_Base>(std::vector<std::shared_ptr<LTL_Base>>(closure.begin(), closure.end()));
 	for (auto B: power_set.get_subsets()) {
 		bool flag = true;
 		for (auto it = closure.begin();it != closure.end() && flag;++ it) {
@@ -107,7 +109,7 @@ GNBA::GNBA(std::shared_ptr<LTL_Base> phi, const std::vector<std::shared_ptr<LTL_
 	power_set = PowerSet<LTL_Base>(AP);
 	for (auto s: power_set.get_subsets()) {
 		std::shared_ptr<Symbol> symbol(new Symbol);
-		set2symbol.emplace(s, symbol), alphabet.push_back(symbol);
+		set2symbol.emplace(s, symbol), alphabet.push_back(symbol), LTL2Symbol.emplace(s, symbol);
 	}
 
 	// compute the delta function

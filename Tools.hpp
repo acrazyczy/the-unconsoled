@@ -16,7 +16,7 @@ inline bool instanceof(const std::shared_ptr<T> ptr) {
 }
 
 template<class T>
-static void read_line(std::istream &is, std::vector<T> &vec) {
+static void read_data_from_a_line(std::istream &is, std::vector<T> &vec) {
 	std::string line;
 	std::getline(is, line);
 	std::istringstream iss(line);

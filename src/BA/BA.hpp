@@ -13,10 +13,19 @@
 
 #include "LTL.hpp"
 #include "PowerSet.hpp"
-#include "TS.hpp"
 
-namespace BA {
-using LTL::LTL_Base;
+namespace BuechiAutomata {
+class NBA;
+class Symbol;
+}
+
+namespace TransitionSystem {
+class TS;
+class Proposition;
+std::shared_ptr<TS> product(const std::shared_ptr<TS> &ts, const std::shared_ptr<BuechiAutomata::NBA> &nba, const std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<BuechiAutomata::Symbol>> &LTL2Symbol, const std::map<std::shared_ptr<Proposition>, std::shared_ptr<LTL::LTL_Base>> &Prop2LTL, const PowerSet<LTL::LTL_Base> &power_set);
+}
+
+namespace BuechiAutomata {
 
 class State {
 	public:
@@ -30,39 +39,40 @@ class State {
 class Symbol {
 };
 
+class BA;
+class NBA;
+
 class BA {
 	public:
 	void make_nonblocking();
-	bool has_maded_nonblocking() const;
 
 	protected:
 	std::map<std::shared_ptr<State>, std::map<std::shared_ptr<Symbol>, std::set<std::shared_ptr<State>>>> delta;
 	std::vector<std::shared_ptr<State>> states;
 	std::vector<std::shared_ptr<Symbol>> alphabet;
-	bool maded_nonblocking;
-};
+	bool maded_nonblocking = false;
 
-class GNBA;
-
-class NBA: public BA {
-	public:
-	NBA(const std::shared_ptr<GNBA> gnba);
-
-	private:
-	std::set<std::shared_ptr<State>> F;
-
-	friend std::shared_ptr<TS> product(const std::shared_ptr<TS> ts, const std::shared_ptr<BA::NBA> nba, const std::map<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>, std::shared_ptr<BA::Symbol>> &LTL2Symbol, const std::map<std::shared_ptr<TS::Proposition>, std::shared_ptr<LTL_Base>> &Prop2LTL, const PowerSet<LTL_Base> &power_set);
+	friend std::shared_ptr<TransitionSystem::TS> TransitionSystem::product(const std::shared_ptr<TransitionSystem::TS> &ts, const std::shared_ptr<BuechiAutomata::NBA> &nba, const std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<BuechiAutomata::Symbol>> &LTL2Symbol, const std::map<std::shared_ptr<TransitionSystem::Proposition>, std::shared_ptr<LTL::LTL_Base>> &Prop2LTL, const PowerSet<LTL::LTL_Base> &power_set);
 };
 
 class GNBA: public BA {
-
 	public:
-	GNBA(std::shared_ptr<LTL_Base> phi, const std::vector<std::shared_ptr<LTL_Base>> &AP, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, PowerSet<LTL_Base> &power_set);
+	GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, const PowerSet<LTL::LTL_Base> &PropLTLs_power_set, const std::shared_ptr<LTL::LTL_Base> &True);
 
 	private:
 	std::vector<std::set<std::shared_ptr<State>>> F;
 
 	friend class NBA;
+};
+
+class NBA: public BA {
+	public:
+	NBA(const std::shared_ptr<GNBA> &gnba);
+
+	private:
+	std::set<std::shared_ptr<State>> F;
+
+	friend std::shared_ptr<TransitionSystem::TS> TransitionSystem::product(const std::shared_ptr<TransitionSystem::TS> &ts, const std::shared_ptr<BuechiAutomata::NBA> &nba, const std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<BuechiAutomata::Symbol>> &LTL2Symbol, const std::map<std::shared_ptr<TransitionSystem::Proposition>, std::shared_ptr<LTL::LTL_Base>> &Prop2LTL, const PowerSet<LTL::LTL_Base> &power_set);
 };
 }
 

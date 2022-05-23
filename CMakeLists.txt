@@ -18,9 +18,13 @@ set(LTL_model_checking
         src/Parser/generated/LTLlangParser.cpp
         src/Parser/generated/LTLlangListener.cpp
         src/Parser/generated/LTLlangBaseListener.cpp
+        src/LTL/LTL.hpp
         src/LTL/LTL.cpp
+        src/BA/BA.hpp
         src/BA/BA.cpp
+        src/TS/TS.hpp
         src/TS/TS.cpp
+        src/Parser/LTLEvalVisitor.hpp
         src/Parser/LTLEvalVisitor.cpp
 )
 

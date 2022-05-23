@@ -12,14 +12,17 @@
 #include <set>
 
 #include "Tools.hpp"
-#include "TS.hpp"
+
+namespace TransitionSystem {
+class Proposition;
+}
 
 namespace LTL {
 class LTL_Base {
 	public:
 
-	virtual std::vector<std::shared_ptr<LTL_Base>> get_children() const;
-	virtual std::string to_string() const;
+	virtual std::vector<std::shared_ptr<LTL_Base>> get_children() const {return std::vector<std::shared_ptr<LTL_Base>>();}
+	virtual std::string to_string() const {return "";}
 	virtual std::set<std::shared_ptr<LTL_Base>> get_closure() const;
 };
 
@@ -75,13 +78,14 @@ class And: public LTL_Base {
 
 class Variable: public LTL_Base {
 	public:
+	Variable(std::shared_ptr<TransitionSystem::Proposition> p_): p(p_) {}
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;
 
 	private:
 
-	std::shared_ptr<TS::Proposition> p;
+	std::shared_ptr<TransitionSystem::Proposition> p;
 };
 
 }

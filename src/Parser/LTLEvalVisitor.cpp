@@ -60,7 +60,7 @@ std::any LTLEvalVisitor::visitImplication_formula(LTLlangParser::Implication_for
 	std::shared_ptr<LTL_Base> not_rhs;
 	if (instanceof<LTL::Negation>(rhs)) not_rhs = rhs -> get_children().front();
 	else not_rhs = std::make_shared<LTL::Negation>(rhs);
-	return std::make_shared<LTL::Negation>(std::make_shared<LTL::And>(lhs, not_rhs))
+	return std::make_shared<LTL::Negation>(std::make_shared<LTL::And>(lhs, not_rhs));
 }
 
 std::any LTLEvalVisitor::visitF_formula(LTLlangParser::F_formulaContext *ctx) {

@@ -18,9 +18,9 @@ using LTL::LTL_Base;
 
 class LTLEvalVisitor: public LTLlangBaseVisitor {
 public:
-	LTLEvalVisitor(const std::map<std::string, std::shared_ptr<TS::Proposition>> &Name2Prop_,
-				   const std::map<std::shared_ptr<TS::Proposition>, std::shared_ptr<LTL_Base>> &Prop2LTL_,
-				   const std::shared_ptr<LTL_Base> True_)
+	LTLEvalVisitor(const std::map<std::string, std::shared_ptr<TransitionSystem::Proposition>> &Name2Prop_,
+				   const std::map<std::shared_ptr<TransitionSystem::Proposition>, std::shared_ptr<LTL_Base>> &Prop2LTL_,
+				   const std::shared_ptr<LTL_Base> &True_)
 				   : Name2Prop(Name2Prop_), Prop2LTL(Prop2LTL_), True(True_), False(std::make_shared<LTL::Negation>(True_)){}
 
 //	virtual std::any visitFormula_in_parentheses(LTLlangParser::Formula_in_parenthesesContext *ctx) override;
@@ -43,9 +43,9 @@ public:
 
 	virtual std::any visitF_formula(LTLlangParser::F_formulaContext *ctx) override;
 private:
-	const std::map<std::string, std::shared_ptr<TS::Proposition>> &Name2Prop;
-	const std::map<std::shared_ptr<TS::Proposition>, std::shared_ptr<LTL_Base>> &Prop2LTL;
-	const std::shared_ptr<LTL_Base> True;
+	const std::map<std::string, std::shared_ptr<TransitionSystem::Proposition>> &Name2Prop;
+	const std::map<std::shared_ptr<TransitionSystem::Proposition>, std::shared_ptr<LTL_Base>> &Prop2LTL;
+	const std::shared_ptr<LTL_Base> &True;
 	std::shared_ptr<LTL_Base> False;
 };
 }

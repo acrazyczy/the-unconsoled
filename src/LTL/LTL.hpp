@@ -25,7 +25,6 @@ class LTL_Base {
 
 class Negation: public LTL_Base {
 	public:
-
 	Negation(std::shared_ptr<LTL_Base> phi_): phi(phi_) {}
 	Negation(LTL_Base *phi_) {Negation(std::shared_ptr<LTL_Base>(phi_));}
 
@@ -40,6 +39,7 @@ class Negation: public LTL_Base {
 
 class Until: public LTL_Base {
 	public:
+	Until(std::shared_ptr<LTL_Base> phi0_, std::shared_ptr<LTL_Base> phi1_): phi0(phi0_), phi1(phi1_) {}
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;
@@ -51,6 +51,7 @@ class Until: public LTL_Base {
 
 class Next: public LTL_Base{
 	public:
+	Next(std::shared_ptr<LTL_Base> phi_): phi(phi_) {}
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;
@@ -62,6 +63,7 @@ class Next: public LTL_Base{
 
 class And: public LTL_Base {
 	public:
+	And(std::shared_ptr<LTL_Base> phi0_, std::shared_ptr<LTL_Base> phi1_): phi0(phi0_), phi1(phi1_) {}
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;

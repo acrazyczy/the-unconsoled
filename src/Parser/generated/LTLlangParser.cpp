@@ -56,18 +56,18 @@ void ltllangParserInitialize() {
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,14,37,2,0,7,0,2,1,7,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
-  	1,0,1,0,1,0,1,0,1,0,1,0,3,0,22,8,0,1,0,1,0,1,0,1,0,1,0,1,0,5,0,30,8,0,
-  	10,0,12,0,33,9,0,1,1,1,1,1,1,0,1,0,2,0,2,0,2,1,0,10,11,1,0,12,13,43,0,
-  	21,1,0,0,0,2,34,1,0,0,0,4,5,6,0,-1,0,5,6,5,1,0,0,6,22,3,0,0,10,7,8,5,
-  	2,0,0,8,22,3,0,0,9,9,10,5,3,0,0,10,22,3,0,0,8,11,12,5,4,0,0,12,22,3,0,
-  	0,7,13,14,5,5,0,0,14,22,3,0,0,5,15,22,3,2,1,0,16,22,5,9,0,0,17,18,5,7,
-  	0,0,18,19,3,0,0,0,19,20,5,8,0,0,20,22,1,0,0,0,21,4,1,0,0,0,21,7,1,0,0,
-  	0,21,9,1,0,0,0,21,11,1,0,0,0,21,13,1,0,0,0,21,15,1,0,0,0,21,16,1,0,0,
-  	0,21,17,1,0,0,0,22,31,1,0,0,0,23,24,10,6,0,0,24,25,7,0,0,0,25,30,3,0,
-  	0,7,26,27,10,4,0,0,27,28,5,6,0,0,28,30,3,0,0,5,29,23,1,0,0,0,29,26,1,
-  	0,0,0,30,33,1,0,0,0,31,29,1,0,0,0,31,32,1,0,0,0,32,1,1,0,0,0,33,31,1,
-  	0,0,0,34,35,7,1,0,0,35,3,1,0,0,0,3,21,29,31
+  	4,1,14,38,2,0,7,0,2,1,7,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
+  	1,0,1,0,1,0,1,0,3,0,20,8,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,5,0,31,
+  	8,0,10,0,12,0,34,9,0,1,1,1,1,1,1,0,1,0,2,0,2,0,2,1,0,10,11,1,0,12,13,
+  	44,0,19,1,0,0,0,2,35,1,0,0,0,4,5,6,0,-1,0,5,6,5,1,0,0,6,20,3,0,0,10,7,
+  	8,5,2,0,0,8,20,3,0,0,9,9,10,5,3,0,0,10,20,3,0,0,8,11,12,5,4,0,0,12,20,
+  	3,0,0,7,13,20,3,2,1,0,14,20,5,9,0,0,15,16,5,7,0,0,16,17,3,0,0,0,17,18,
+  	5,8,0,0,18,20,1,0,0,0,19,4,1,0,0,0,19,7,1,0,0,0,19,9,1,0,0,0,19,11,1,
+  	0,0,0,19,13,1,0,0,0,19,14,1,0,0,0,19,15,1,0,0,0,20,32,1,0,0,0,21,22,10,
+  	6,0,0,22,23,7,0,0,0,23,31,3,0,0,7,24,25,10,5,0,0,25,26,5,5,0,0,26,31,
+  	3,0,0,6,27,28,10,4,0,0,28,29,5,6,0,0,29,31,3,0,0,5,30,21,1,0,0,0,30,24,
+  	1,0,0,0,30,27,1,0,0,0,31,34,1,0,0,0,32,30,1,0,0,0,32,33,1,0,0,0,33,1,
+  	1,0,0,0,34,32,1,0,0,0,35,36,7,1,0,0,36,3,1,0,0,0,3,19,30,32
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -349,8 +349,12 @@ std::any LTLlangParser::X_formulaContext::accept(tree::ParseTreeVisitor *visitor
 }
 //----------------- Implication_formulaContext ------------------------------------------------------------------
 
-LTLlangParser::FormulaContext* LTLlangParser::Implication_formulaContext::formula() {
-  return getRuleContext<LTLlangParser::FormulaContext>(0);
+std::vector<LTLlangParser::FormulaContext *> LTLlangParser::Implication_formulaContext::formula() {
+  return getRuleContexts<LTLlangParser::FormulaContext>();
+}
+
+LTLlangParser::FormulaContext* LTLlangParser::Implication_formulaContext::formula(size_t i) {
+  return getRuleContext<LTLlangParser::FormulaContext>(i);
 }
 
 LTLlangParser::Implication_formulaContext::Implication_formulaContext(FormulaContext *ctx) { copyFrom(ctx); }
@@ -423,7 +427,7 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(21);
+    setState(19);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LTLlangParser::T__0: {
@@ -471,23 +475,12 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
         break;
       }
 
-      case LTLlangParser::T__4: {
-        _localctx = _tracker.createInstance<Implication_formulaContext>(_localctx);
-        _ctx = _localctx;
-        previousContext = _localctx;
-        setState(13);
-        match(LTLlangParser::T__4);
-        setState(14);
-        formula(5);
-        break;
-      }
-
       case LTLlangParser::True:
       case LTLlangParser::False: {
         _localctx = _tracker.createInstance<Logic_constContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
-        setState(15);
+        setState(13);
         logicConstant();
         break;
       }
@@ -496,7 +489,7 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
         _localctx = _tracker.createInstance<Atomic_propositionContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
-        setState(16);
+        setState(14);
         match(LTLlangParser::Identifier);
         break;
       }
@@ -505,11 +498,11 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
         _localctx = _tracker.createInstance<Formula_in_parenthesesContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
-        setState(17);
+        setState(15);
         match(LTLlangParser::T__6);
-        setState(18);
+        setState(16);
         formula(0);
-        setState(19);
+        setState(17);
         match(LTLlangParser::T__7);
         break;
       }
@@ -518,7 +511,7 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
       throw NoViableAltException(this);
     }
     _ctx->stop = _input->LT(-1);
-    setState(31);
+    setState(32);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
@@ -526,17 +519,17 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
         if (!_parseListeners.empty())
           triggerExitRuleEvent();
         previousContext = _localctx;
-        setState(29);
+        setState(30);
         _errHandler->sync(this);
         switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1, _ctx)) {
         case 1: {
           auto newContext = _tracker.createInstance<Logic_formulaContext>(_tracker.createInstance<FormulaContext>(parentContext, parentState));
           _localctx = newContext;
           pushNewRecursionContext(newContext, startState, RuleFormula);
-          setState(23);
+          setState(21);
 
           if (!(precpred(_ctx, 6))) throw FailedPredicateException(this, "precpred(_ctx, 6)");
-          setState(24);
+          setState(22);
           antlrcpp::downCast<Logic_formulaContext *>(_localctx)->op = _input->LT(1);
           _la = _input->LA(1);
           if (!(_la == LTLlangParser::AndOp
@@ -548,21 +541,35 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
             _errHandler->reportMatch(this);
             consume();
           }
-          setState(25);
+          setState(23);
           formula(7);
           break;
         }
 
         case 2: {
+          auto newContext = _tracker.createInstance<Implication_formulaContext>(_tracker.createInstance<FormulaContext>(parentContext, parentState));
+          _localctx = newContext;
+          pushNewRecursionContext(newContext, startState, RuleFormula);
+          setState(24);
+
+          if (!(precpred(_ctx, 5))) throw FailedPredicateException(this, "precpred(_ctx, 5)");
+          setState(25);
+          match(LTLlangParser::T__4);
+          setState(26);
+          formula(6);
+          break;
+        }
+
+        case 3: {
           auto newContext = _tracker.createInstance<U_formulaContext>(_tracker.createInstance<FormulaContext>(parentContext, parentState));
           _localctx = newContext;
           pushNewRecursionContext(newContext, startState, RuleFormula);
-          setState(26);
+          setState(27);
 
           if (!(precpred(_ctx, 4))) throw FailedPredicateException(this, "precpred(_ctx, 4)");
-          setState(27);
-          match(LTLlangParser::T__5);
           setState(28);
+          match(LTLlangParser::T__5);
+          setState(29);
           formula(5);
           break;
         }
@@ -571,7 +578,7 @@ LTLlangParser::FormulaContext* LTLlangParser::formula(int precedence) {
           break;
         } 
       }
-      setState(33);
+      setState(34);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx);
     }
@@ -637,7 +644,7 @@ LTLlangParser::LogicConstantContext* LTLlangParser::logicConstant() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(34);
+    setState(35);
     _la = _input->LA(1);
     if (!(_la == LTLlangParser::True
 
@@ -672,7 +679,8 @@ bool LTLlangParser::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 bool LTLlangParser::formulaSempred(FormulaContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 0: return precpred(_ctx, 6);
-    case 1: return precpred(_ctx, 4);
+    case 1: return precpred(_ctx, 5);
+    case 2: return precpred(_ctx, 4);
 
   default:
     break;

@@ -151,7 +151,8 @@ public:
   public:
     Implication_formulaContext(FormulaContext *ctx);
 
-    FormulaContext *formula();
+    std::vector<FormulaContext *> formula();
+    FormulaContext* formula(size_t i);
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
 

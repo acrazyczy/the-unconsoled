@@ -6,7 +6,7 @@ formula
     | 'F' formula                           # f_formula
     | 'X' formula                           # x_formula
     | formula op = (AndOp | OrOp) formula   # logic_formula
-    | '->' formula                          # implication_formula
+    | formula '->' formula                  # implication_formula
     | formula 'U' formula                   # u_formula
     | logicConstant                         # logic_const
     | Identifier                            # atomic_proposition

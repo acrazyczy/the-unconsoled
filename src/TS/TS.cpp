@@ -75,7 +75,7 @@ std::shared_ptr<TS> product(
 		states_list.emplace_back();
 		for (size_t j = 0;j < nba -> states.size();++ j) {
 			std::shared_ptr<State> state(new State);
-			ret -> trans.emplace(), ret -> S.push_back(state), ret -> L.emplace(state, std::set<std::shared_ptr<Proposition>>());
+			ret -> trans.emplace(state,  std::set<std::pair<std::shared_ptr<State>, std::shared_ptr<Action>>>()), ret -> S.push_back(state), ret -> L.emplace(state, std::set<std::shared_ptr<Proposition>>());
 			states_list.back().push_back(state);
 		}
 	}

@@ -6,24 +6,22 @@
 #include "LTL.hpp"
 
 namespace LTL {
-std::set<std::shared_ptr<LTL::LTL_Base>> LTL::LTL_Base::get_closure() const {
+std::set<std::shared_ptr<LTL::LTL_Base>> LTL::LTL_Base::get_closure(std::shared_ptr<LTL_Base> tptr) const {
 	std::set<std::shared_ptr<LTL::LTL_Base>> ret{
-		std::shared_ptr<LTL::LTL_Base>(const_cast<LTL::LTL_Base *>(this)),
-		std::shared_ptr<LTL::LTL_Base>(new Negation(const_cast<LTL::LTL_Base *>(this))),
+		tptr,
+		std::shared_ptr<LTL::LTL_Base>(new Negation(tptr)),
 	};
 	for (auto phi: get_children()) {
-		std::set<std::shared_ptr<LTL::LTL_Base>> tmp(std::move(phi -> get_closure()));
+		std::set<std::shared_ptr<LTL::LTL_Base>> tmp(std::move(phi -> get_closure(phi)));
 		ret.insert(tmp.begin(), tmp.end());
 	}
 	return std::move(ret);
 }
 
-std::set<std::shared_ptr<LTL::LTL_Base>> Negation::get_closure() const {
-	std::set<std::shared_ptr<LTL::LTL_Base>> ret{
-		std::shared_ptr<LTL::LTL_Base>(const_cast<Negation *>(this))
-	};
+std::set<std::shared_ptr<LTL::LTL_Base>> Negation::get_closure(std::shared_ptr<LTL_Base> tptr) const {
+	std::set<std::shared_ptr<LTL::LTL_Base>> ret{tptr};
 	for (auto phi: get_children()) {
-		std::set<std::shared_ptr<LTL::LTL_Base>> tmp(std::move(phi -> get_closure()));
+		std::set<std::shared_ptr<LTL::LTL_Base>> tmp(std::move(phi -> get_closure(phi)));
 		ret.insert(tmp.begin(), tmp.end());
 	}
 	return std::move(ret);

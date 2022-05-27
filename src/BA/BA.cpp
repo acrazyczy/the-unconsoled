@@ -21,6 +21,7 @@ void BA::make_nonblocking() {
 }
 
 NBA::NBA(const std::shared_ptr<GNBA> &gnba){
+	alphabet = gnba -> alphabet;
 	size_t k = gnba -> F.size();
 	std::vector<std::vector<std::shared_ptr<State>>> states_list; // N_S * [k]
 	std::map<std::shared_ptr<State>, size_t> index;
@@ -30,13 +31,16 @@ NBA::NBA(const std::shared_ptr<GNBA> &gnba){
 		for (size_t j = 0;j < k;++ j) {
 			std::shared_ptr<State> state(new State(!j));
 			delta.emplace(state, std::map<std::shared_ptr<Symbol>, std::set<std::shared_ptr<State>>>());
+			for (const auto &symbol: alphabet)
+				delta.at(state).emplace(symbol, std::set<std::shared_ptr<State>>());
 			states.push_back(state);
 			states_list.back().push_back(state);
 		}
 	}
-	for (size_t i = 0;i < gnba -> states.size();++ i)
-		if (gnba -> F.at(0).find(gnba -> states.at(i)) != gnba -> F.at(0).end())
-			F.insert(states_list.at(i).at(0));
+	if (k)
+		for (size_t i = 0;i < gnba -> states.size();++ i)
+			if (gnba -> F.at(0).find(gnba -> states.at(i)) != gnba -> F.at(0).end())
+				F.insert(states_list.at(i).at(0));
 	for (size_t i = 0;i < gnba -> states.size();++ i) {
 		std::shared_ptr<State> state = gnba -> states.at(i);
 		for (auto [symbol, next_states]: gnba -> delta.at(state)) {
@@ -55,11 +59,10 @@ NBA::NBA(const std::shared_ptr<GNBA> &gnba){
 			}
 		}
 	}
-	alphabet = gnba -> alphabet;
 }
 
 GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, const PowerSet<LTL::LTL_Base> &PropLTLs_power_set, const std::shared_ptr<LTL::LTL_Base> &True) {
-	std::set<std::shared_ptr<LTL::LTL_Base>> closure = std::move(phi -> get_closure());
+	std::set<std::shared_ptr<LTL::LTL_Base>> closure = std::move(phi -> get_closure(phi));
 	bool has_True = closure.find(True) != closure.end();
 
 	// compute elementary sets of closure(phi)
@@ -91,7 +94,8 @@ GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<s
 					flag &= B -> find(psi) != B -> end();
 				} else {
 					bool found = false;
-					for (const auto &phi_: *B) found |= instanceof<LTL::Negation>(phi_) && *phi_ -> get_children().begin() == *it;
+					for (const auto &phi_: *B)
+						found |= instanceof<LTL::Negation>(phi_) && *phi_ -> get_children().begin() == *it;
 					flag &= found;
 				}
 		}
@@ -143,7 +147,22 @@ GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<s
 					flag &= (B -> find(*it) != B -> end()) == ((B -> find(phi1) != B -> end()) || ((B -> find(phi0) != B -> end()) && (B_prime -> find(*it) != B_prime -> end())));
 				}
 			}
-			if (flag) delta.at(set2state.at(B)).at(set2symbol.at(A)).insert(set2state.at(B_prime));
+			if (flag) {
+				std::map<std::shared_ptr<Symbol>, std::set<std::shared_ptr<State>>> &delta_B = delta.at(set2state.at(B));
+				std::shared_ptr<Symbol> symbol = set2symbol.at(A);
+				std::shared_ptr<State> state_B_prime = set2state.at(B_prime);
+				if (delta_B.find(symbol) == delta_B.end())
+					delta_B.emplace(symbol, std::set<std::shared_ptr<State>>{state_B_prime});
+				else
+					delta_B.at(symbol).emplace(state_B_prime);
+				std::cerr << "delta: a transition from {" << std::endl;
+				for (const auto &phi: *B) std::cerr << "\t" << phi -> to_string() << std::endl;
+				std::cerr << "} to {" << std::endl;
+				for (const auto &phi: *B_prime) std::cerr << "\t" << phi -> to_string() << std::endl;
+				std::cerr << "} by {" << std::endl;
+				for (const auto &phi: *A) std::cerr << "\t" << phi -> to_string() << std::endl;
+				std::cerr << "}." << std::endl << std::endl;
+			}
 		}
 	}
 }

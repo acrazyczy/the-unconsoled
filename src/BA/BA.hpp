@@ -6,6 +6,7 @@
 #ifndef THE_UNCONSOLED_BA_HPP
 #define THE_UNCONSOLED_BA_HPP
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <map>

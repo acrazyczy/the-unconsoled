@@ -17,6 +17,10 @@ int main()
 	std::ifstream in("input.txt");
 	std::cin.rdbuf(in.rdbuf());
 
+	// bind stderr to file
+	std::ofstream err("log.txt");
+	std::cerr.rdbuf(err.rdbuf());
+
 	// input TransitionSystem
 	std::shared_ptr<TransitionSystem::TS> ts = std::make_shared<TransitionSystem::TS>();
 	std::cin >> ts;
@@ -40,13 +44,16 @@ int main()
 	antlr4::tree::ParseTree* tree = parser.formula();
 	Parser::LTLEvalVisitor visitor(Name2Prop, Prop2LTL, True);
 	std::shared_ptr<LTL::LTL_Base> root = std::any_cast<std::shared_ptr<LTL::LTL_Base>>(visitor.visit(tree));
+	std::shared_ptr<LTL::LTL_Base> LTL_root;
+	if (instanceof<LTL::Negation>(root)) LTL_root = *root -> get_children().begin();
+	else LTL_root = std::make_shared<LTL::Negation>(root);
 
 	// build the symbol mapping table
 	PowerSet<LTL::LTL_Base> PropLTLs_power_set(PropLTLs);
 	std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<BuechiAutomata::Symbol>> LTL2Symbol;
 
 	// convert LTL formula to GNBA
-	std::shared_ptr<BuechiAutomata::GNBA> gnba = std::make_shared<BuechiAutomata::GNBA>(root, LTL2Symbol, PropLTLs_power_set, True);
+	std::shared_ptr<BuechiAutomata::GNBA> gnba = std::make_shared<BuechiAutomata::GNBA>(LTL_root, LTL2Symbol, PropLTLs_power_set, True);
 	gnba -> make_nonblocking();
 
 	// convert GNBA to NBA

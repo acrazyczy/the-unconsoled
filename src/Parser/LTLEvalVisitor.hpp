@@ -23,7 +23,7 @@ public:
 				   const std::shared_ptr<LTL_Base> &True_)
 				   : Name2Prop(Name2Prop_), Prop2LTL(Prop2LTL_), True(True_), False(std::make_shared<LTL::Negation>(True_)){}
 
-//	virtual std::any visitFormula_in_parentheses(LTLlangParser::Formula_in_parenthesesContext *ctx) override;
+	virtual std::any visitFormula_in_parentheses(LTLlangParser::Formula_in_parenthesesContext *ctx) override;
 
 	virtual std::any visitLogicConstant(LTLlangParser::LogicConstantContext *ctx) override;
 

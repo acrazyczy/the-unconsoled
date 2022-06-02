@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 project(the_unconsoled)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 set(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 include_directories(
         ${PROJECT_SOURCE_DIR}/src/
         ${PROJECT_SOURCE_DIR}/src/Parser
@@ -46,4 +50,4 @@ file(GLOB antlr4-cpp-src
 
 add_library (antlr4-cpp-runtime ${antlr4-cpp-src})
 add_executable(the_unconsoled ${LTL_model_checking} ${Tools} src/main.cpp)
-target_link_libraries(the_unconsoled antlr4-cpp-runtime)
+target_link_libraries(the_unconsoled PRIVATE antlr4-cpp-runtime Threads::Threads)

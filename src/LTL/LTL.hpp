@@ -23,7 +23,7 @@ class LTL_Base {
 
 	virtual std::vector<std::shared_ptr<LTL_Base>> get_children() const {return std::vector<std::shared_ptr<LTL_Base>>();}
 	virtual std::string to_string() const {return "true";}
-	virtual std::set<std::shared_ptr<LTL_Base>> get_closure(std::shared_ptr<LTL_Base> tptr) const;
+	virtual std::set<std::shared_ptr<LTL_Base>> get_closure(std::shared_ptr<LTL_Base> tptr, std::shared_ptr<LTL_Base> fptr) const;
 };
 
 class Negation: public LTL_Base {
@@ -32,7 +32,7 @@ class Negation: public LTL_Base {
 
 	std::vector<std::shared_ptr<LTL_Base>> get_children() const override;
 	std::string to_string() const override;
-	std::set<std::shared_ptr<LTL_Base>> get_closure(std::shared_ptr<LTL_Base> tptr) const;
+	std::set<std::shared_ptr<LTL_Base>> get_closure(std::shared_ptr<LTL_Base> tptr, std::shared_ptr<LTL_Base> fptr) const;
 
 	private:
 

@@ -8,8 +8,8 @@
 namespace BuechiAutomata {
 bool State::get_is_initial() const {return is_initial;}
 
-void BA::make_nonblocking() {
-	if (maded_nonblocking) return;
+std::shared_ptr<State> BA::make_nonblocking() {
+	if (maded_nonblocking) return {nullptr};
 	std::shared_ptr<State> trap(new State);
 	delta.emplace(trap, std::map<std::shared_ptr<Symbol>, std::set<std::shared_ptr<State>>>());
 	states.push_back(trap);
@@ -18,18 +18,21 @@ void BA::make_nonblocking() {
 			if (delta.at(state).find(symbol) == delta.at(state).end())
 				delta.at(state).emplace(symbol, std::set<std::shared_ptr<State>>{trap});
 	maded_nonblocking = true;
+	return trap;
 }
 
-NBA::NBA(const std::shared_ptr<GNBA> &gnba){
+NBA::NBA(const std::shared_ptr<GNBA> &gnba, std::map<std::shared_ptr<State>, std::pair<std::shared_ptr<State>, size_t>> &state2state_index) {
 	alphabet = gnba -> alphabet;
 	size_t k = gnba -> F.size();
 	std::vector<std::vector<std::shared_ptr<State>>> states_list; // N_S * [k]
 	std::map<std::shared_ptr<State>, size_t> index;
 	for (size_t i = 0;i < gnba -> states.size();++ i) {
-		index.emplace(gnba -> states.at(i), i);
+		const std::shared_ptr<State> &state_ = gnba -> states.at(i);
+		index.emplace(state_, i);
 		states_list.emplace_back();
 		for (size_t j = 0;j < k;++ j) {
-			std::shared_ptr<State> state(new State(!j));
+			std::shared_ptr<State> state(new State(!j && state_ -> get_is_initial()));
+			state2state_index.emplace(state, std::make_pair(state_, j));
 			delta.emplace(state, std::map<std::shared_ptr<Symbol>, std::set<std::shared_ptr<State>>>());
 			for (const auto &symbol: alphabet)
 				delta.at(state).emplace(symbol, std::set<std::shared_ptr<State>>());
@@ -61,8 +64,57 @@ NBA::NBA(const std::shared_ptr<GNBA> &gnba){
 	}
 }
 
-GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, const PowerSet<LTL::LTL_Base> &PropLTLs_power_set, const std::shared_ptr<LTL::LTL_Base> &True) {
-	std::set<std::shared_ptr<LTL::LTL_Base>> closure = std::move(phi -> get_closure(phi));
+std::string to_string(std::shared_ptr<NBA> nba, const std::map<std::shared_ptr<State>, std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>> &state2set, const std::map<std::shared_ptr<State>, std::pair<std::shared_ptr<State>, size_t>> &state2state, const std::map<std::shared_ptr<Symbol>, std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>> &Symbol2LTL) {
+	std::string ret("NBA starts from here.\n");
+	ret += nba -> maded_nonblocking ? "(Non-blocking)\n" : "(Maybe Blocking)\n";
+	ret += "States:\n";
+	for (const auto &state: nba -> states) {
+		ret += "\t{";
+		const auto &[state_, index] = state2state.at(state);
+		for (const auto &phi: *state2set.at(state_)) ret += phi -> to_string() + ", ";
+		ret += "} * " + std::to_string(index);
+		if (state -> get_is_initial()) ret += " (initial)";
+		ret += ",\n";
+	}
+	ret += "\nAlphabet:\n";
+	for (const auto &symbol: nba -> alphabet) {
+		ret += "\t{";
+		const std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>> &set = Symbol2LTL.at(symbol);
+		for (const auto &phi: *set) ret += phi -> to_string() + ", ";
+		ret += "},\n";
+	}
+	ret += "\nDelta function:\n";
+	for (const auto &state: nba -> states)
+		for (const auto &[symbol, next_states]: nba -> delta.at(state))
+			for (const auto &next_state: next_states) {
+				ret += "\t{";
+				const auto &[state_, index] = state2state.at(state);
+				for (const auto &phi: *state2set.at(state_)) ret += phi -> to_string() + ", ";
+				ret += "} * " + std::to_string(index) + " -> {";
+				const auto &[state__, index_] = state2state.at(next_state);
+				for (const auto &phi: *state2set.at(state__)) ret += phi -> to_string() + ", ";
+				ret += "} * " + std::to_string(index_) + " with symbol = {";
+				for (const auto &phi: *Symbol2LTL.at(symbol)) ret += phi -> to_string() + ", ";
+				ret += "},\n";
+			}
+	ret += "\nF set:\n";
+	for (const auto &state: nba -> F) {
+		const auto &[state_, index] = state2state.at(state);
+		ret += "\t{";
+		for (const auto &phi: *state2set.at(state_)) ret += phi -> to_string() + ", ";
+		ret += "} * " + std::to_string(index) + ",\n";
+	}
+	ret += "\nGNBA ends at here.";
+	return ret;
+}
+
+GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<Symbol>> &LTL2Symbol, std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<State>> &set2state, const PowerSet<LTL::LTL_Base> &PropLTLs_power_set, const std::shared_ptr<LTL::LTL_Base> &True) {
+	std::set<std::shared_ptr<LTL::LTL_Base>> closure = std::move(phi -> get_closure(phi, std::shared_ptr<LTL::LTL_Base>()));
+	for (const auto &propLTL: PropLTLs_power_set.get_universe())
+		if (closure.find(propLTL) == closure.end()) {
+			closure.emplace(propLTL);
+			closure.emplace(std::make_shared<LTL::Negation>(propLTL));
+		}
 	bool has_True = closure.find(True) != closure.end();
 
 	// compute elementary sets of closure(phi)
@@ -103,7 +155,6 @@ GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<s
 	}
 
 	// initialize states
-	std::map<std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>, std::shared_ptr<State>> set2state;
 	for (const auto &B: elementary_sets) {
 		std::shared_ptr<State> state(new State(B -> find(phi) != B -> end()));
 		set2state.emplace(B, state), states.push_back(state);
@@ -155,15 +206,53 @@ GNBA::GNBA(const std::shared_ptr<LTL::LTL_Base> &phi, std::map<std::shared_ptr<s
 					delta_B.emplace(symbol, std::set<std::shared_ptr<State>>{state_B_prime});
 				else
 					delta_B.at(symbol).emplace(state_B_prime);
-				std::cerr << "delta: a transition from {" << std::endl;
-				for (const auto &phi: *B) std::cerr << "\t" << phi -> to_string() << std::endl;
-				std::cerr << "} to {" << std::endl;
-				for (const auto &phi: *B_prime) std::cerr << "\t" << phi -> to_string() << std::endl;
-				std::cerr << "} by {" << std::endl;
-				for (const auto &phi: *A) std::cerr << "\t" << phi -> to_string() << std::endl;
-				std::cerr << "}." << std::endl << std::endl;
 			}
 		}
 	}
+}
+
+std::string to_string(std::shared_ptr<GNBA> gnba, const std::map<std::shared_ptr<State>, std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>> &state2set, const std::map<std::shared_ptr<Symbol>, std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>>> &Symbol2LTL) {
+	std::string ret("GNBA starts from here.\n");
+	ret += gnba -> maded_nonblocking ? "(Non-blocking)\n" : "(Maybe Blocking)\n";
+	ret += "States:\n";
+	for (const auto &state: gnba -> states) {
+		ret += "\t{";
+		const std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>> &set = state2set.at(state);
+		for (const auto &phi: *set) ret += phi -> to_string() + ", ";
+		ret += "}";
+		if (state -> get_is_initial()) ret += " (initial)";
+		ret += ",\n";
+	}
+	ret += "\nAlphabet:\n";
+	for (const auto &symbol: gnba -> alphabet) {
+		ret += "\t{";
+		const std::shared_ptr<std::set<std::shared_ptr<LTL::LTL_Base>>> &set = Symbol2LTL.at(symbol);
+		for (const auto &phi: *set) ret += phi -> to_string() + ", ";
+		ret += "},\n";
+	}
+	ret += "\nDelta function:\n";
+	for (const auto &state: gnba -> states)
+		for (const auto &[symbol, next_states]: gnba -> delta.at(state))
+			for (const auto &next_state: next_states) {
+				ret += "\t{";
+				for (const auto &phi: *state2set.at(state)) ret += phi -> to_string() + ", ";
+				ret += "} -> {";
+				for (const auto &phi: *state2set.at(next_state)) ret += phi -> to_string() + ", ";
+				ret += "} with symbol = {";
+				for (const auto &phi: *Symbol2LTL.at(symbol)) ret += phi -> to_string() + ", ";
+				ret += "},\n";
+			}
+	ret += "\nF set family:\n";
+	for (const auto &final_set: gnba -> F) {
+		ret += "\t{\n";
+		for (const auto &state: final_set) {
+			ret += "\t\t{";
+			for (const auto &phi: *state2set.at(state)) ret += phi -> to_string() + ", ";
+			ret += "}\n";
+		}
+		ret += "\t},\n";
+	}
+	ret += "\nGNBA ends at here.";
+	return ret;
 }
 }

@@ -18,7 +18,7 @@ logicConstant:
     ;
 
 Identifier
-    : [a-zA-Z]+
+    : [a-z]
     ;
 
 AndOp

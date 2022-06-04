@@ -13,8 +13,8 @@
 
 int main()
 {
-	// bind stdin to file
-	std::ifstream in("input.txt");
+	// bind stdin to TS.txt
+	std::ifstream in("TS.txt");
 	std::cin.rdbuf(in.rdbuf());
 
 	// bind stderr to file
@@ -34,6 +34,10 @@ int main()
 		PropLTLs.emplace_back(ltl), Prop2LTL.emplace(prop, ltl);
 	}
 	std::shared_ptr<LTL::LTL_Base> True(new LTL::LTL_Base);
+
+	// bind stdin to benchmark.txt
+	in.close(), in.open("benchmark.txt");
+	std::cin.rdbuf(in.rdbuf());
 
 	size_t Q0, Q1;
 	std::vector<int> qtmp;
@@ -97,8 +101,8 @@ int main()
 			result = production -> persistence_checking(F_props, entries);
 		}
 
-		if (result) std::cout << "TransitionSystem models varphi." << std::endl;
-		else std::cout << "TransitionSystem doesn't model varphi." << std::endl;
+		if (result) std::cout << 1 << std::endl;
+		else std::cout << 0 << std::endl;
 	}
 
 	return 0;

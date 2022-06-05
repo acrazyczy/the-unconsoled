@@ -1,5 +1,13 @@
 # the-unconsoled
-CS3959 homework in ACM 2019 class, a model checking algorithm for LTL formula
+CS3959 homework in ACM 2019 class, a model checking algorithm for LTL formula.
+## Requirements
+[Antlr4](https://github.com/antlr/antlr4)
+## Installation and run
+```
+cd the-unconsoled
+cmake CMakeLists.txt && make
+./the-unconsoled
+```
 ## Input and output
 The program loads transition system from `TS.txt` and LTL formula from `benchmark.txt`. The debug info is written to `log.txt`.
 
